@@ -1,0 +1,12 @@
+{
+    "name": "laundrypro/laundrypro",
+    "description": "Laundry Management System - Entities & Core MVC Structure",
+    "type": "project",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "App\\": "app/"
+        }
+    },
+    "require": {}
+}
