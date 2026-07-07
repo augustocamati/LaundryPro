@@ -20,12 +20,12 @@ class ClienteController extends Controller {
         $clientes = $this->clienteDAO->all();
 
         if ($q !== '') {
-            $qLower = mb_strtolower($q);
+            $qLower = strtolower($q);
             $clientes = array_values(array_filter($clientes, function ($cliente) use ($qLower): bool {
-                return stripos(mb_strtolower($cliente->getNome()), $qLower) !== false
-                    || stripos(mb_strtolower($cliente->getEmail() ?? ''), $qLower) !== false
-                    || stripos(mb_strtolower($cliente->getTelefone() ?? ''), $qLower) !== false
-                    || stripos(mb_strtolower($cliente->getBi() ?? ''), $qLower) !== false;
+                return stripos(strtolower($cliente->getNome()), $qLower) !== false
+                    || stripos(strtolower($cliente->getEmail() ?? ''), $qLower) !== false
+                    || stripos(strtolower($cliente->getTelefone() ?? ''), $qLower) !== false
+                    || stripos(strtolower($cliente->getBi() ?? ''), $qLower) !== false;
             }));
         }
 

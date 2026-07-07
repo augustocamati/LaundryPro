@@ -29,13 +29,13 @@ class ServicoController extends Controller {
         }
 
         if ($q !== '') {
-            $qLower = mb_strtolower($q);
+            $qLower = strtolower($q);
             $servicos = array_values(array_filter($servicos, function ($servico) use ($qLower, $categoriasById): bool {
                 $categoriaNome = isset($categoriasById[(int) $servico->getCategoriaId()])
-                    ? mb_strtolower($categoriasById[(int) $servico->getCategoriaId()]->getNome())
+                    ? strtolower($categoriasById[(int) $servico->getCategoriaId()]->getNome())
                     : '';
-                return stripos(mb_strtolower($servico->getNome()), $qLower) !== false
-                    || stripos(mb_strtolower($servico->getDescricao() ?? ''), $qLower) !== false
+                return stripos(strtolower($servico->getNome()), $qLower) !== false
+                    || stripos(strtolower($servico->getDescricao() ?? ''), $qLower) !== false
                     || stripos($categoriaNome, $qLower) !== false;
             }));
         }

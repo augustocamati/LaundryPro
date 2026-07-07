@@ -20,10 +20,10 @@ class PerfilController extends Controller {
         $perfis = $this->perfilDAO->all();
 
         if ($q !== '') {
-            $qLower = mb_strtolower($q);
+            $qLower = strtolower($q);
             $perfis = array_values(array_filter($perfis, function ($perfil) use ($qLower): bool {
-                return stripos(mb_strtolower($perfil->getNome()), $qLower) !== false
-                    || stripos(mb_strtolower($perfil->getDescricao() ?? ''), $qLower) !== false;
+                return stripos(strtolower($perfil->getNome()), $qLower) !== false
+                    || stripos(strtolower($perfil->getDescricao() ?? ''), $qLower) !== false;
             }));
         }
 

@@ -6,6 +6,7 @@ use App\Core\Auth;
 use App\Core\Controller;
 use App\DAO\PagamentoDAO;
 use App\DAO\PedidoDAO;
+use App\DAO\ClienteDAO;
 use App\Models\Pagamento;
 
 class PagamentoController extends Controller {
@@ -19,12 +20,30 @@ class PagamentoController extends Controller {
         $pedidoDAO = new PedidoDAO();
         $pagamentos = $pagamentoDAO->all();
 
+        // Fetch pending orders for the dropdown only
+        $pedidosPendentes = $pedidoDAO->findByStatus('Pendente');
+
+        // Build cliente map for display in payments list
+        $clienteDAO = new ClienteDAO();
+        $clientes = $clienteDAO->all();
+        $clientesById = [];
+        foreach ($clientes as $c) {
+            $clientesById[(int) $c->getId()] = $c;
+        }
+
+        // Build pedidos map (all orders) for lookup by id
+        $pedidosAll = $pedidoDAO->all();
+        $pedidosById = [];
+        foreach ($pedidosAll as $p) {
+            $pedidosById[(int) $p->getId()] = $p;
+        }
+
         if ($q !== '') {
-            $qLower = mb_strtolower($q);
+            $qLower = strtolower($q);
             $pagamentos = array_values(array_filter($pagamentos, function ($pagamento) use ($qLower): bool {
                 return stripos((string) $pagamento->getPedidoId(), $qLower) !== false
-                    || stripos(mb_strtolower($pagamento->getMetodoPagamento()), $qLower) !== false
-                    || stripos(mb_strtolower($pagamento->getStatus()), $qLower) !== false;
+                    || stripos(strtolower($pagamento->getMetodoPagamento()), $qLower) !== false
+                    || stripos(strtolower($pagamento->getStatus()), $qLower) !== false;
             }));
         }
 
@@ -32,7 +51,9 @@ class PagamentoController extends Controller {
             'title' => 'Pagamentos - LaundryPro',
             'activePage' => 'pagamentos',
             'pagamentos' => $pagamentos,
-            'pedidos' => $pedidoDAO->all(),
+            'pedidos' => $pedidosPendentes,
+            'clientesById' => $clientesById,
+            'pedidosById' => $pedidosById,
             'q' => $q,
         ]);
     }
@@ -57,6 +78,15 @@ class PagamentoController extends Controller {
 
         $pagamentoDAO = new PagamentoDAO();
         $pagamentoDAO->create($pagamento);
+
+        // Atualiza o status do pedido ao registrar o pagamento
+        $pedidoDAO = new PedidoDAO();
+        $pedido = $pedidoDAO->find($pedidoId);
+        if ($pedido) {
+            $pedido->setStatus($status);
+            $pedidoDAO->update($pedido);
+        }
+
         $this->redirect('/pagamentos');
     }
 

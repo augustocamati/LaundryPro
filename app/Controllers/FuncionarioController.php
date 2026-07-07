@@ -23,12 +23,12 @@ class FuncionarioController extends Controller {
         $funcionarios = $this->funcionarioDAO->all();
 
         if ($q !== '') {
-            $qLower = mb_strtolower($q);
+            $qLower = strtolower($q);
             $funcionarios = array_values(array_filter($funcionarios, function ($funcionario) use ($qLower): bool {
                 $usuario = $this->usuarioDAO->find($funcionario->getUsuarioId());
-                $nome = $usuario ? mb_strtolower($usuario->getNome()) : '';
+                $nome = $usuario ? strtolower($usuario->getNome()) : '';
                 return stripos($nome, $qLower) !== false
-                    || stripos(mb_strtolower($funcionario->getCargo()), $qLower) !== false;
+                    || stripos(strtolower($funcionario->getCargo()), $qLower) !== false;
             }));
         }
 

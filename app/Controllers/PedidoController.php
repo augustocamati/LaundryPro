@@ -8,8 +8,10 @@ use App\DAO\ClienteDAO;
 use App\DAO\ItemPedidoDAO;
 use App\DAO\PedidoDAO;
 use App\DAO\ServicoDAO;
+use App\DAO\PagamentoDAO;
 use App\Models\ItemPedido;
 use App\Models\Pedido;
+use App\Models\Pagamento;
 
 class PedidoController extends Controller {
     public function index(): void {
@@ -19,11 +21,19 @@ class PedidoController extends Controller {
         $pedidoDAO = new PedidoDAO();
         $pedidos = $pedidoDAO->all();
 
+        // Build a mapping clientId => cliente object for display
+        $clienteDAO = new ClienteDAO();
+        $clientes = $clienteDAO->all();
+        $clientesById = [];
+        foreach ($clientes as $c) {
+            $clientesById[(int) $c->getId()] = $c;
+        }
+
         if ($q !== '') {
-            $qLower = mb_strtolower($q);
+            $qLower = strtolower($q);
             $pedidos = array_values(array_filter($pedidos, function ($pedido) use ($qLower): bool {
                 return stripos((string) $pedido->getId(), $qLower) !== false
-                    || stripos(mb_strtolower($pedido->getStatus()), $qLower) !== false;
+                    || stripos(strtolower($pedido->getStatus()), $qLower) !== false;
             }));
         }
 
@@ -31,6 +41,7 @@ class PedidoController extends Controller {
             'title' => 'Pedidos - LaundryPro',
             'activePage' => 'pedidos',
             'pedidos' => $pedidos,
+            'clientesById' => $clientesById,
             'q' => $q,
         ]);
     }
@@ -56,7 +67,9 @@ class PedidoController extends Controller {
 
         $clienteId = (int) ($_POST['cliente_id'] ?? 0);
         $servicoId = (int) ($_POST['servico_id'] ?? 0);
-        $quantidade = max(1, (int) ($_POST['quantidade'] ?? 1));
+        $kilos = max(0.1, (float) ($_POST['kilos'] ?? 1));
+        $status = trim($_POST['status'] ?? 'Pendente');
+        $estadoPagamento = trim($_POST['estado_pagamento'] ?? 'Pendente');
         $observacoes = trim($_POST['observacoes'] ?? '');
 
         if ($clienteId <= 0 || $servicoId <= 0) {
@@ -72,8 +85,8 @@ class PedidoController extends Controller {
         $pedido = new Pedido([
             'cliente_id' => $clienteId,
             'data_entrega_prevista' => date('Y-m-d H:i:s', strtotime('+3 days')),
-            'status' => 'Pendente',
-            'valor_total' => $servico->getPreco() * $quantidade,
+            'status' => $status,
+            'valor_total' => $servico->getPreco() * $kilos,
             'observacoes' => $observacoes,
         ]);
 
@@ -86,13 +99,26 @@ class PedidoController extends Controller {
         $item = new ItemPedido([
             'pedido_id' => $pedidoId,
             'servico_id' => $servicoId,
-            'quantidade' => $quantidade,
+            'quantidade' => $kilos,
             'preco_unitario' => $servico->getPreco(),
-            'subtotal' => $servico->getPreco() * $quantidade,
+            'subtotal' => $servico->getPreco() * $kilos,
         ]);
 
         $itemPedidoDAO = new ItemPedidoDAO();
         $itemPedidoDAO->create($item);
+
+        // If order was created and marked as paid, create a payment record
+        if (strtolower($estadoPagamento) === 'pago') {
+            $pagamento = new Pagamento([
+                'pedido_id' => $pedidoId,
+                'valor' => $pedido->getValorTotal(),
+                'metodo_pagamento' => 'Dinheiro',
+                'status' => 'Pago',
+                'data_pagamento' => date('Y-m-d H:i:s'),
+            ]);
+            $pagamentoDAO = new PagamentoDAO();
+            $pagamentoDAO->create($pagamento);
+        }
 
         $this->redirect('/pedidos');
     }

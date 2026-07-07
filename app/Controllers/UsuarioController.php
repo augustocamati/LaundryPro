@@ -23,13 +23,13 @@ class UsuarioController extends Controller {
         $usuarios = $this->usuarioDAO->all();
 
         if ($q !== '') {
-            $qLower = mb_strtolower($q);
+            $qLower = strtolower($q);
             $usuarios = array_values(array_filter($usuarios, function ($usuario) use ($qLower): bool {
                 $perfil = $this->perfilDAO->find($usuario->getPerfilId());
-                $perfilNome = $perfil ? mb_strtolower($perfil->getNome()) : '';
-                return stripos(mb_strtolower($usuario->getNome()), $qLower) !== false
-                    || stripos(mb_strtolower($usuario->getEmail()), $qLower) !== false
-                    || stripos(mb_strtolower($usuario->getTelefone() ?? ''), $qLower) !== false
+                $perfilNome = $perfil ? strtolower($perfil->getNome()) : '';
+                return stripos(strtolower($usuario->getNome()), $qLower) !== false
+                    || stripos(strtolower($usuario->getEmail()), $qLower) !== false
+                    || stripos(strtolower($usuario->getTelefone() ?? ''), $qLower) !== false
                     || stripos($perfilNome, $qLower) !== false;
             }));
         }

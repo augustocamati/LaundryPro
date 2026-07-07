@@ -20,10 +20,10 @@ class CategoriaController extends Controller {
         $categorias = $this->categoriaDAO->all();
 
         if ($q !== '') {
-            $qLower = mb_strtolower($q);
+            $qLower = strtolower($q);
             $categorias = array_values(array_filter($categorias, function ($categoria) use ($qLower): bool {
-                return stripos(mb_strtolower($categoria->getNome()), $qLower) !== false
-                    || stripos(mb_strtolower($categoria->getDescricao() ?? ''), $qLower) !== false;
+                return stripos(strtolower($categoria->getNome()), $qLower) !== false
+                    || stripos(strtolower($categoria->getDescricao() ?? ''), $qLower) !== false;
             }));
         }
 
