@@ -1,9 +1,18 @@
 <?php require BASE_PATH . '/app/Views/partials/header.php'; ?>
 
-<div class="flex-container">
-    <h1>Clientes Cadastrados</h1>
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h3 mb-0">Clientes Cadastrados</h1>
     <a href="/clientes/novo" class="btn btn-primary">+ Novo Cliente</a>
 </div>
+
+<form method="get" action="/clientes" class="row g-2 mb-3">
+    <div class="col-md-8">
+        <input type="text" name="q" class="form-control" placeholder="Pesquisar por nome, telefone, e-mail ou BI" value="<?= htmlspecialchars($q ?? '') ?>">
+    </div>
+    <div class="col-md-4">
+        <button class="btn btn-outline-secondary w-100" type="submit">Pesquisar</button>
+    </div>
+</form>
 
 <div class="card">
     <div class="table-responsive">
