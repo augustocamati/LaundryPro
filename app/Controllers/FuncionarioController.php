@@ -3,6 +3,7 @@
 namespace App\Controllers;
 
 use App\Core\Controller;
+use App\Core\Auth;
 use App\Models\Funcionario;
 use App\DAO\FuncionarioDAO;
 use App\DAO\UsuarioDAO;
@@ -12,17 +13,31 @@ class FuncionarioController extends Controller {
     private UsuarioDAO $usuarioDAO;
 
     public function __construct() {
+        Auth::requireAuth();
         $this->funcionarioDAO = new FuncionarioDAO();
         $this->usuarioDAO = new UsuarioDAO();
     }
 
     public function index(): void {
+        $q = trim($_GET['q'] ?? '');
         $funcionarios = $this->funcionarioDAO->all();
+
+        if ($q !== '') {
+            $qLower = mb_strtolower($q);
+            $funcionarios = array_values(array_filter($funcionarios, function ($funcionario) use ($qLower): bool {
+                $usuario = $this->usuarioDAO->find($funcionario->getUsuarioId());
+                $nome = $usuario ? mb_strtolower($usuario->getNome()) : '';
+                return stripos($nome, $qLower) !== false
+                    || stripos(mb_strtolower($funcionario->getCargo()), $qLower) !== false;
+            }));
+        }
+
         $this->render('funcionarios.index', [
             'title' => 'Lista de Funcionários - LaundryPro',
             'activePage' => 'funcionarios',
             'funcionarios' => $funcionarios,
-            'usuarioDAO' => $this->usuarioDAO
+            'usuarioDAO' => $this->usuarioDAO,
+            'q' => $q,
         ]);
     }
 

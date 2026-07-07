@@ -3,6 +3,7 @@
 namespace App\Controllers;
 
 use App\Core\Controller;
+use App\Core\Auth;
 use App\Models\Perfil;
 use App\DAO\PerfilDAO;
 
@@ -10,15 +11,27 @@ class PerfilController extends Controller {
     private PerfilDAO $perfilDAO;
 
     public function __construct() {
+        Auth::requireAuth();
         $this->perfilDAO = new PerfilDAO();
     }
 
     public function index(): void {
+        $q = trim($_GET['q'] ?? '');
         $perfis = $this->perfilDAO->all();
+
+        if ($q !== '') {
+            $qLower = mb_strtolower($q);
+            $perfis = array_values(array_filter($perfis, function ($perfil) use ($qLower): bool {
+                return stripos(mb_strtolower($perfil->getNome()), $qLower) !== false
+                    || stripos(mb_strtolower($perfil->getDescricao() ?? ''), $qLower) !== false;
+            }));
+        }
+
         $this->render('perfis.index', [
             'title' => 'Lista de Perfis - LaundryPro',
             'activePage' => 'perfis',
-            'perfis' => $perfis
+            'perfis' => $perfis,
+            'q' => $q,
         ]);
     }
 

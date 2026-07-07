@@ -3,6 +3,7 @@
 namespace App\Controllers;
 
 use App\Core\Controller;
+use App\Core\Auth;
 use App\Models\Usuario;
 use App\DAO\UsuarioDAO;
 use App\DAO\PerfilDAO;
@@ -12,17 +13,33 @@ class UsuarioController extends Controller {
     private PerfilDAO $perfilDAO;
 
     public function __construct() {
+        Auth::requireAuth();
         $this->usuarioDAO = new UsuarioDAO();
         $this->perfilDAO = new PerfilDAO();
     }
 
     public function index(): void {
+        $q = trim($_GET['q'] ?? '');
         $usuarios = $this->usuarioDAO->all();
+
+        if ($q !== '') {
+            $qLower = mb_strtolower($q);
+            $usuarios = array_values(array_filter($usuarios, function ($usuario) use ($qLower): bool {
+                $perfil = $this->perfilDAO->find($usuario->getPerfilId());
+                $perfilNome = $perfil ? mb_strtolower($perfil->getNome()) : '';
+                return stripos(mb_strtolower($usuario->getNome()), $qLower) !== false
+                    || stripos(mb_strtolower($usuario->getEmail()), $qLower) !== false
+                    || stripos(mb_strtolower($usuario->getTelefone() ?? ''), $qLower) !== false
+                    || stripos($perfilNome, $qLower) !== false;
+            }));
+        }
+
         $this->render('usuarios.index', [
             'title' => 'Lista de Usuários - LaundryPro',
             'activePage' => 'usuarios',
             'usuarios' => $usuarios,
-            'perfilDAO' => $this->perfilDAO
+            'perfilDAO' => $this->perfilDAO,
+            'q' => $q,
         ]);
     }
 

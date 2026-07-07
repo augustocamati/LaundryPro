@@ -3,6 +3,7 @@
 namespace App\Controllers;
 
 use App\Core\Controller;
+use App\Core\Auth;
 use App\Models\Cliente;
 use App\DAO\ClienteDAO;
 
@@ -10,15 +11,29 @@ class ClienteController extends Controller {
     private ClienteDAO $clienteDAO;
 
     public function __construct() {
+        Auth::requireAuth();
         $this->clienteDAO = new ClienteDAO();
     }
 
     public function index(): void {
+        $q = trim($_GET['q'] ?? '');
         $clientes = $this->clienteDAO->all();
+
+        if ($q !== '') {
+            $qLower = mb_strtolower($q);
+            $clientes = array_values(array_filter($clientes, function ($cliente) use ($qLower): bool {
+                return stripos(mb_strtolower($cliente->getNome()), $qLower) !== false
+                    || stripos(mb_strtolower($cliente->getEmail() ?? ''), $qLower) !== false
+                    || stripos(mb_strtolower($cliente->getTelefone() ?? ''), $qLower) !== false
+                    || stripos(mb_strtolower($cliente->getBi() ?? ''), $qLower) !== false;
+            }));
+        }
+
         $this->render('clientes.index', [
             'title' => 'Lista de Clientes - LaundryPro',
             'activePage' => 'clientes',
-            'clientes' => $clientes
+            'clientes' => $clientes,
+            'q' => $q,
         ]);
     }
 
