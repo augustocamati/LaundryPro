@@ -23,16 +23,20 @@
         <form method="post" action="/pagamentos/registrar" class="row g-3">
             <div class="col-md-4">
                 <label class="form-label">Pedido</label>
-                <select name="pedido_id" class="form-select" required>
+                <select id="pedido_select" name="pedido_id" class="form-select" required>
                     <option value="">Selecione</option>
                     <?php foreach ($pedidos as $pedido): ?>
-                        <option value="<?= (int) $pedido->getId() ?>">#<?= (int) $pedido->getId() ?> - <?= htmlspecialchars($pedido->getStatus()) ?></option>
+                        <option value="<?= (int) $pedido->getId() ?>" data-valor="<?= number_format($pedido->getValorTotal(), 2, '.', '') ?>" data-cliente="<?= htmlspecialchars($clientesById[(int)$pedido->getClienteId()]->getNome() ?? '') ?>" data-status="<?= htmlspecialchars($pedido->getStatus()) ?>">#<?= (int) $pedido->getId() ?> - <?= htmlspecialchars($clientesById[(int)$pedido->getClienteId()]->getNome() ?? '') ?></option>
                     <?php endforeach; ?>
                 </select>
             </div>
             <div class="col-md-2">
                 <label class="form-label">Valor</label>
-                <input type="number" name="valor" class="form-control" min="0" step="0.01" required>
+                <input id="valor_input" type="number" name="valor" class="form-control" min="0" step="0.01" required>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Cliente</label>
+                <input id="cliente_nome" type="text" class="form-control" readonly>
             </div>
             <div class="col-md-2">
                 <label class="form-label">Método</label>
@@ -76,20 +80,21 @@
                     </thead>
                     <tbody>
                         <?php foreach ($pagamentos as $pagamento): ?>
-                            <tr>
-                                <td><?= (int) $pagamento->getId() ?></td>
-                                <td>#<?= (int) $pagamento->getPedidoId() ?></td>
-                                <td>AOA <?= number_format($pagamento->getValor(), 2, ',', '.') ?></td>
-                                <td><?= htmlspecialchars($pagamento->getMetodoPagamento()) ?></td>
-                                <td><?= htmlspecialchars($pagamento->getStatus()) ?></td>
-                                <td>
-                                    <?php if ($pagamento->getStatus() !== 'Cancelado'): ?>
-                                        <form action="/pagamentos/<?= (int) $pagamento->getId() ?>/cancelar" method="post" style="display:inline;">
-                                            <button class="btn btn-sm btn-outline-danger" type="submit">Cancelar</button>
-                                        </form>
-                                    <?php endif; ?>
-                                </td>
-                            </tr>
+                                <tr>
+                                    <td><?= (int) $pagamento->getId() ?></td>
+                                    <td>#<?= (int) $pagamento->getPedidoId() ?></td>
+                                    <td><?= htmlspecialchars($clientesById[(int)$pedidosById[(int)$pagamento->getPedidoId()]->getClienteId()]->getNome() ?? '') ?></td>
+                                    <td>AOA <?= number_format($pagamento->getValor(), 2, ',', '.') ?></td>
+                                    <td><?= htmlspecialchars($pagamento->getMetodoPagamento()) ?></td>
+                                    <td><?= htmlspecialchars($pagamento->getStatus()) ?></td>
+                                    <td>
+                                        <?php if ($pagamento->getStatus() !== 'Cancelado'): ?>
+                                            <form action="/pagamentos/<?= (int) $pagamento->getId() ?>/cancelar" method="post" style="display:inline;">
+                                                <button class="btn btn-sm btn-outline-danger" type="submit">Cancelar</button>
+                                            </form>
+                                        <?php endif; ?>
+                                    </td>
+                                </tr>
                         <?php endforeach; ?>
                     </tbody>
                 </table>
@@ -101,3 +106,25 @@
 </div>
 
 <?php require dirname(__DIR__) . '/partials/footer.php'; ?>
+
+<script>
+    (function () {
+        const select = document.getElementById('pedido_select');
+        const valorInput = document.getElementById('valor_input');
+        const clienteNome = document.getElementById('cliente_nome');
+
+        function preencher() {
+            const opt = select.selectedOptions[0];
+            if (!opt || !opt.value) {
+                valorInput.value = '';
+                clienteNome.value = '';
+                return;
+            }
+            valorInput.value = opt.dataset.valor || '';
+            clienteNome.value = opt.dataset.cliente || '';
+        }
+
+        select.addEventListener('change', preencher);
+        preencher();
+    })();
+</script>

@@ -33,12 +33,21 @@
                     </select>
                 </div>
                 <div class="col-md-4">
-                    <label for="quantidade" class="form-label">Quantidade</label>
-                    <input id="quantidade" name="quantidade" type="number" min="1" value="1" class="form-control" required>
+                    <label for="kilos" class="form-label">Peso (kg)</label>
+                    <input id="kilos" name="kilos" type="number" min="0.1" step="0.01" value="1" class="form-control" required>
                 </div>
                 <div class="col-md-4">
                     <label class="form-label">Valor estimado</label>
                     <div class="form-control bg-light" id="valorEstimado">AOA 0,00</div>
+                </div>
+                <div class="col-md-4">
+                    <label for="status" class="form-label">Estado do pedido</label>
+                    <select id="status" name="status" class="form-select">
+                        <option value="Pendente">Pendente</option>
+                        <option value="Pago">Pago</option>
+                        <option value="Cancelado">Cancelado</option>
+                        <option value="Estornado">Estornado</option>
+                    </select>
                 </div>
                 <div class="col-md-4">
                     <label for="observacoes" class="form-label">Observações</label>
@@ -46,7 +55,17 @@
                 </div>
             </div>
 
-            <div class="mt-4 d-flex gap-2">
+            <div class="row g-3 mt-4">
+                <div class="col-md-4">
+                    <label for="estado_pagamento" class="form-label">Estado do pagamento</label>
+                    <select id="estado_pagamento" name="estado_pagamento" class="form-select">
+                        <option value="Pendente">Pendente</option>
+                        <option value="Pago">Pago</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="mt-3 d-flex gap-2">
                 <button type="submit" class="btn btn-primary">Guardar pedido</button>
                 <button type="reset" class="btn btn-outline-secondary">Limpar</button>
             </div>
@@ -56,14 +75,14 @@
 
 <script>
     const selectServico = document.getElementById('servico_id');
-    const quantidadeInput = document.getElementById('quantidade');
+    const quantidadeInput = document.getElementById('kilos');
     const valorEstimado = document.getElementById('valorEstimado');
 
     function atualizarValor() {
         const selected = selectServico.selectedOptions[0];
         const preco = parseFloat(selected?.dataset.preco || '0');
-        const quantidade = parseInt(quantidadeInput.value || '1', 10);
-        const total = preco * quantidade;
+        const quantidade = parseFloat(quantidadeInput.value || '1');
+        const total = preco * quantidade; // price per kilo
         valorEstimado.textContent = 'AOA ' + total.toFixed(2).replace('.', ',');
     }
 

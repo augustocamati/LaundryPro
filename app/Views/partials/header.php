@@ -40,7 +40,7 @@
                 <li class="nav-item"><a class="nav-link <?= ($activePage ?? '') === 'clientes' ? 'active' : '' ?>" href="/clientes">Clientes</a></li>
                 <li class="nav-item"><a class="nav-link <?= ($activePage ?? '') === 'categorias' ? 'active' : '' ?>" href="/categorias">Categorias</a></li>
                 <li class="nav-item"><a class="nav-link <?= ($activePage ?? '') === 'servicos' ? 'active' : '' ?>" href="/servicos">Serviços</a></li>
-                <li class="nav-item"><a class="nav-link <?= ($activePage ?? '') === 'pesquisas' ? 'active' : '' ?>" href="/pesquisas">Pesquisas</a></li>
+                <!-- Pesquisas removido conforme solicitado -->
                 <li class="nav-item"><a class="nav-link <?= ($activePage ?? '') === 'pagamentos' ? 'active' : '' ?>" href="/pagamentos">Pagamentos</a></li>
                 <li class="nav-item"><a class="nav-link <?= ($activePage ?? '') === 'pedidos' ? 'active' : '' ?>" href="/pedidos">Pedidos</a></li>
             </ul>

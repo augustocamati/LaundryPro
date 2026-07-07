@@ -36,7 +36,7 @@
                         <?php foreach ($pedidos as $pedido): ?>
                             <tr>
                                 <td><?= (int) $pedido->getId() ?></td>
-                                <td><?= htmlspecialchars($pedido->getClienteId()) ?></td>
+                                <td><?= htmlspecialchars($clientesById[(int)$pedido->getClienteId()]->getNome() ?? $pedido->getClienteId()) ?></td>
                                 <td><span class="badge bg-info-subtle text-info-emphasis"><?= htmlspecialchars($pedido->getStatus()) ?></span></td>
                                 <td>AOA <?= number_format($pedido->getValorTotal(), 2, ',', '.') ?></td>
                                 <td><?= htmlspecialchars($pedido->getDataEntregaPrevista()) ?></td>
