@@ -83,7 +83,7 @@ CREATE TABLE IF NOT EXISTS `pedidos` (
     `data_pedido` DATETIME DEFAULT CURRENT_TIMESTAMP,
     `data_entrega_prevista` DATETIME NOT NULL,
     `data_entrega_real` DATETIME NULL,
-    `status` ENUM('Pendente', 'Em Processamento', 'Pronto', 'Entregue', 'Cancelado') DEFAULT 'Pendente',
+    `status` ENUM('Pendente', 'Pago', 'Cancelado', 'Estornado', 'Em Processamento', 'Pronto', 'Entregue') DEFAULT 'Pendente',
     `valor_total` DECIMAL(10,2) DEFAULT 0.00,
     `observacoes` TEXT NULL,
     `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP,
