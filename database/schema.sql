@@ -22,6 +22,8 @@ CREATE TABLE IF NOT EXISTS `usuarios` (
     `senha` VARCHAR(255) NOT NULL,
     `telefone` VARCHAR(20) NULL,
     `status` ENUM('ativo', 'inativo') DEFAULT 'ativo',
+    `token_recuperacao` VARCHAR(64) NULL DEFAULT NULL,
+    `token_expira_em` DATETIME NULL DEFAULT NULL,
     `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP,
     `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     CONSTRAINT `fk_usuarios_perfil` FOREIGN KEY (`perfil_id`) REFERENCES `perfis` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE
