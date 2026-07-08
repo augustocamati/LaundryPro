@@ -49,6 +49,7 @@ CREATE TABLE IF NOT EXISTS `clientes` (
     `telefone` VARCHAR(20) NOT NULL,
     `bi` VARCHAR(20) NULL UNIQUE,
     `endereco` VARCHAR(255) NULL,
+    `document_path` VARCHAR(255) NULL,
     `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP,
     `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -86,6 +87,7 @@ CREATE TABLE IF NOT EXISTS `pedidos` (
     `status` ENUM('Pendente', 'Pago', 'Cancelado', 'Estornado', 'Em Processamento', 'Pronto', 'Entregue') DEFAULT 'Pendente',
     `valor_total` DECIMAL(10,2) DEFAULT 0.00,
     `observacoes` TEXT NULL,
+    `document_path` VARCHAR(255) NULL,
     `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP,
     `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     CONSTRAINT `fk_pedidos_cliente` FOREIGN KEY (`cliente_id`) REFERENCES `clientes` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE,

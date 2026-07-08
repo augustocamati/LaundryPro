@@ -8,6 +8,7 @@ use App\DAO\PagamentoDAO;
 use App\DAO\PedidoDAO;
 use App\DAO\ClienteDAO;
 use App\Models\Pagamento;
+use Dompdf\Dompdf;
 
 class PagamentoController extends Controller {
     public function __construct() {
@@ -109,5 +110,39 @@ class PagamentoController extends Controller {
             'activePage' => 'pagamentos',
             'pagamentos' => $pagamentos,
         ]);
+    }
+
+    public function relatoriosPdf(): void {
+        Auth::requireAuth();
+
+        $pagamentoDAO = new PagamentoDAO();
+        $pagamentos = $pagamentoDAO->all();
+
+        $viewFile = BASE_PATH . '/app/Views/pagamentos/relatorios_pdf.php';
+        if (!file_exists($viewFile)) {
+            $this->redirect('/pagamentos/relatorios?error=missing_view');
+        }
+
+        // Render the PDF HTML using the view
+        ob_start();
+        // expose $pagamentos to the view
+        $pagamentos = $pagamentos;
+        require $viewFile;
+        $html = ob_get_clean();
+
+        if (!class_exists('\Dompdf\\Dompdf')) {
+            // If Dompdf not available, show the HTML page instead
+            header('Content-Type: text/html; charset=utf-8');
+            echo $html;
+            exit;
+        }
+
+        $dompdf = new Dompdf();
+        $dompdf->loadHtml($html);
+        $dompdf->setPaper('A4', 'portrait');
+        $dompdf->render();
+        $filename = 'relatorio_pagamentos_' . date('Ymd_His') . '.pdf';
+        $dompdf->stream($filename, ['Attachment' => true]);
+        exit;
     }
 }

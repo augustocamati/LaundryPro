@@ -5,8 +5,8 @@
     <a href="/clientes" class="btn btn-secondary">< Voltar</a>
 </div>
 
-<div class="card">
-    <form action="/clientes" method="POST">
+    <div class="card">
+    <form action="/clientes" method="POST" enctype="multipart/form-data">
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;">
             <div class="form-group">
                 <label class="form-label" for="nome">Nome Completo *</label>
@@ -34,6 +34,11 @@
         <div class="form-group">
             <label class="form-label" for="endereco">Endereço de Residência</label>
             <input type="text" id="endereco" name="endereco" class="form-control" placeholder="Ex: Bairro Alvalade, Luanda">
+        </div>
+
+        <div class="form-group">
+            <label class="form-label" for="documento">Documento (BI ou comprovante) - opcional</label>
+            <input type="file" id="documento" name="documento" accept="image/*,application/pdf" class="form-control">
         </div>
 
         <button type="submit" class="btn btn-primary">Salvar Cliente</button>

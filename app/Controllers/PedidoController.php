@@ -88,6 +88,7 @@ class PedidoController extends Controller {
             'status' => $status,
             'valor_total' => $servico->getPreco() * $kilos,
             'observacoes' => $observacoes,
+            'document_path' => null,
         ]);
 
         $pedidoDAO = new PedidoDAO();
@@ -106,6 +107,29 @@ class PedidoController extends Controller {
 
         $itemPedidoDAO = new ItemPedidoDAO();
         $itemPedidoDAO->create($item);
+
+        // Handle file upload for pedido (optional)
+        if (!empty($_FILES['documento']['name'])) {
+            $uploaded = $_FILES['documento'];
+            if (is_uploaded_file($uploaded['tmp_name'])) {
+                $maxSize = 5 * 1024 * 1024; // 5MB
+                $allowed = ['image/jpeg','image/png','application/pdf'];
+                $finfo = finfo_open(FILEINFO_MIME_TYPE);
+                $mime = finfo_file($finfo, $uploaded['tmp_name']);
+                finfo_close($finfo);
+                if (in_array($mime, $allowed) && $uploaded['size'] <= $maxSize) {
+                    $uploadDir = BASE_PATH . '/public/uploads/pedidos';
+                    if (!is_dir($uploadDir)) mkdir($uploadDir, 0755, true);
+                    $ext = pathinfo($uploaded['name'], PATHINFO_EXTENSION);
+                    $filename = 'pedido_' . $pedidoId . '_' . time() . '_' . bin2hex(random_bytes(5)) . '.' . $ext;
+                    $dest = $uploadDir . '/' . $filename;
+                    if (move_uploaded_file($uploaded['tmp_name'], $dest)) {
+                        $pedido->setDocumentPath('/uploads/pedidos/' . $filename);
+                        $pedidoDAO->update($pedido);
+                    }
+                }
+            }
+        }
 
         // If order was created and marked as paid, create a payment record
         if (strtolower($estadoPagamento) === 'pago') {

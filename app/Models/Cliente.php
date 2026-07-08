@@ -11,6 +11,7 @@ class Cliente extends Model {
     protected string $telefone;
     protected ?string $bi = null;
     protected ?string $endereco = null;
+    protected ?string $documentPath = null;
     protected ?string $createdAt = null;
     protected ?string $updatedAt = null;
 
@@ -65,6 +66,15 @@ class Cliente extends Model {
 
     public function setEndereco(?string $endereco): self {
         $this->endereco = $endereco;
+        return $this;
+    }
+
+    public function getDocumentPath(): ?string {
+        return $this->documentPath;
+    }
+
+    public function setDocumentPath(?string $documentPath): self {
+        $this->documentPath = $documentPath;
         return $this;
     }
 

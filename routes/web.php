@@ -72,6 +72,7 @@ $router->get('/pagamentos', 'PagamentoController@index');
 $router->post('/pagamentos/registrar', 'PagamentoController@registrar');
 $router->post('/pagamentos/{id}/cancelar', 'PagamentoController@cancelar');
 $router->get('/pagamentos/relatorios', 'PagamentoController@relatorios');
+$router->get('/pagamentos/relatorios/pdf', 'PagamentoController@relatoriosPdf');
 
 // Pedidos
 $router->get('/pedidos', 'PedidoController@index');

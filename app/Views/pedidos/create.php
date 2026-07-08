@@ -10,7 +10,7 @@
 
 <div class="card shadow-sm border-0">
     <div class="card-body">
-        <form method="post" action="/pedidos">
+        <form method="post" action="/pedidos" enctype="multipart/form-data">
             <div class="row g-3">
                 <div class="col-md-6">
                     <label for="cliente_id" class="form-label">Cliente</label>
@@ -62,6 +62,13 @@
                         <option value="Pendente">Pendente</option>
                         <option value="Pago">Pago</option>
                     </select>
+                </div>
+            </div>
+
+            <div class="row g-3 mt-3">
+                <div class="col-md-6">
+                    <label for="documento" class="form-label">Documento (opcional)</label>
+                    <input id="documento" name="documento" type="file" accept="image/*,application/pdf" class="form-control">
                 </div>
             </div>
 

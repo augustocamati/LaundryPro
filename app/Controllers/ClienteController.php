@@ -50,6 +50,7 @@ class ClienteController extends Controller {
         $telefone = $_POST['telefone'] ?? '';
         $bi = $_POST['bi'] ?? null;
         $endereco = $_POST['endereco'] ?? null;
+        $documentPath = null;
 
         if (empty($nome) || empty($telefone)) {
             throw new \Exception("Nome e telefone são campos obrigatórios.");
@@ -60,8 +61,34 @@ class ClienteController extends Controller {
             'email' => empty($email) ? null : $email,
             'telefone' => $telefone,
             'bi' => empty($bi) ? null : $bi,
-            'endereco' => empty($endereco) ? null : $endereco
+            'endereco' => empty($endereco) ? null : $endereco,
+            'document_path' => null
         ]);
+
+        // Handle file upload (optional)
+        if (!empty($_FILES['documento']['name'])) {
+            $uploaded = $_FILES['documento'];
+            if (is_uploaded_file($uploaded['tmp_name'])) {
+                $maxSize = 5 * 1024 * 1024; // 5MB
+                if ($uploaded['size'] <= $maxSize) {
+                    $allowed = ['image/jpeg','image/png','application/pdf'];
+                    $finfo = finfo_open(FILEINFO_MIME_TYPE);
+                    $mime = finfo_file($finfo, $uploaded['tmp_name']);
+                    finfo_close($finfo);
+                    if (in_array($mime, $allowed)) {
+                        $uploadDir = BASE_PATH . '/public/uploads/clients';
+                        if (!is_dir($uploadDir)) mkdir($uploadDir, 0755, true);
+                        $ext = pathinfo($uploaded['name'], PATHINFO_EXTENSION);
+                        $filename = 'client_' . time() . '_' . bin2hex(random_bytes(5)) . '.' . $ext;
+                        $dest = $uploadDir . '/' . $filename;
+                        if (move_uploaded_file($uploaded['tmp_name'], $dest)) {
+                            $documentPath = '/uploads/clients/' . $filename;
+                            $cliente->setDocumentPath($documentPath);
+                        }
+                    }
+                }
+            }
+        }
 
         $this->clienteDAO->create($cliente);
         $this->redirect('/clientes');
@@ -101,6 +128,33 @@ class ClienteController extends Controller {
         $cliente->setTelefone($telefone);
         $cliente->setBi(empty($bi) ? null : $bi);
         $cliente->setEndereco(empty($endereco) ? null : $endereco);
+
+        // Handle file upload (optional replacement)
+        if (!empty($_FILES['documento']['name'])) {
+            $uploaded = $_FILES['documento'];
+            if (is_uploaded_file($uploaded['tmp_name'])) {
+                $maxSize = 5 * 1024 * 1024; // 5MB
+                $allowed = ['image/jpeg','image/png','application/pdf'];
+                $finfo = finfo_open(FILEINFO_MIME_TYPE);
+                $mime = finfo_file($finfo, $uploaded['tmp_name']);
+                finfo_close($finfo);
+                if (in_array($mime, $allowed) && $uploaded['size'] <= $maxSize) {
+                    $uploadDir = BASE_PATH . '/public/uploads/clients';
+                    if (!is_dir($uploadDir)) mkdir($uploadDir, 0755, true);
+                    $ext = pathinfo($uploaded['name'], PATHINFO_EXTENSION);
+                    $filename = 'client_' . time() . '_' . bin2hex(random_bytes(5)) . '.' . $ext;
+                    $dest = $uploadDir . '/' . $filename;
+                    if (move_uploaded_file($uploaded['tmp_name'], $dest)) {
+                        // Optionally delete old file
+                        if ($cliente->getDocumentPath()) {
+                            $old = BASE_PATH . '/public' . $cliente->getDocumentPath();
+                            if (file_exists($old)) unlink($old);
+                        }
+                        $cliente->setDocumentPath('/uploads/clients/' . $filename);
+                    }
+                }
+            }
+        }
 
         $this->clienteDAO->update($cliente);
         $this->redirect('/clientes');

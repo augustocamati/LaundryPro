@@ -14,6 +14,7 @@ class Pedido extends Model {
     protected string $status = 'Pendente';
     protected float $valorTotal = 0.00;
     protected ?string $observacoes = null;
+    protected ?string $documentPath = null;
     protected ?string $createdAt = null;
     protected ?string $updatedAt = null;
 
@@ -95,6 +96,15 @@ class Pedido extends Model {
 
     public function setObservacoes(?string $observacoes): self {
         $this->observacoes = $observacoes;
+        return $this;
+    }
+
+    public function getDocumentPath(): ?string {
+        return $this->documentPath;
+    }
+
+    public function setDocumentPath(?string $documentPath): self {
+        $this->documentPath = $documentPath;
         return $this;
     }
 

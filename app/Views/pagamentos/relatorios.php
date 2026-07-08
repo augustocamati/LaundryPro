@@ -8,6 +8,11 @@
     <a href="/pagamentos" class="btn btn-outline-secondary">Voltar</a>
 </div>
 
+<div class="d-flex justify-content-end mb-3">
+    <a href="/pagamentos/relatorios/pdf" class="btn btn-primary me-2">Baixar PDF</a>
+    <a href="/pagamentos" class="btn btn-outline-secondary">Voltar</a>
+</div>
+
 <div class="row g-4">
     <div class="col-md-4">
         <div class="card shadow-sm border-0">
