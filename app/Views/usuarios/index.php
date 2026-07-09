@@ -44,12 +44,12 @@
                             <td><strong><?= htmlspecialchars($usuario->getNome()) ?></strong></td>
                             <td><?= htmlspecialchars($usuario->getEmail()) ?></td>
                             <td><?= htmlspecialchars($usuario->getTelefone() ?? '-') ?></td>
-                            <td><span class="badge badge-info"><?= htmlspecialchars($perfilNome) ?></span></td>
+                            <td><span class="badge bg-info-subtle text-info-emphasis"><?= htmlspecialchars($perfilNome) ?></span></td>
                             <td>
                                 <?php if ($usuario->getStatus() === 'ativo'): ?>
-                                    <span class="badge badge-success">Ativo</span>
+                                    <span class="badge bg-success-subtle text-success-emphasis">Ativo</span>
                                 <?php else: ?>
-                                    <span class="badge badge-danger">Inativo</span>
+                                    <span class="badge bg-danger-subtle text-danger-emphasis">Inativo</span>
                                 <?php endif; ?>
                             </td>
                             <td>
