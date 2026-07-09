@@ -95,6 +95,18 @@ class Auth {
     }
 
     /**
+     * Check if the logged-in user is an Admin.
+     */
+    public static function isAdmin(): bool {
+        $perfilId = self::perfilId();
+        if (!$perfilId) return false;
+
+        $perfilDAO = new \App\DAO\PerfilDAO();
+        $perfil = $perfilDAO->find($perfilId);
+        return $perfil && strtolower($perfil->getNome()) === 'admin';
+    }
+
+    /**
      * Require the user to be logged in, redirect to login otherwise.
      */
     public static function requireAuth(): void {

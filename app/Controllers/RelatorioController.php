@@ -44,4 +44,50 @@ class RelatorioController extends Controller {
 
         exit;
     }
+
+    public function downloadLogs(): void {
+        Auth::requireAuth();
+
+        if (!Auth::isAdmin()) {
+            \App\Core\Session::flash('error', 'Sem permissão para baixar logs.');
+            $this->redirect('/');
+            return;
+        }
+
+        $db = \App\Core\Database::getConnection();
+        $stmt = $db->query("
+            SELECT l.*, u.nome AS usuario_nome 
+            FROM logs l 
+            LEFT JOIN usuarios u ON l.usuario_id = u.id 
+            ORDER BY l.created_at DESC LIMIT 1000
+        ");
+        $logs = $stmt->fetchAll();
+
+        header('Content-Type: text/csv; charset=utf-8');
+        header('Content-Disposition: attachment; filename=relatorio_logs_' . date('Y-m-d') . '.csv');
+
+        $output = fopen('php://output', 'w');
+        fprintf($output, chr(0xEF).chr(0xBB).chr(0xBF));
+        
+        fputcsv($output, ['ID Log', 'Usuário', 'Ação', 'Descrição', 'IP', 'Data/Hora']);
+
+        foreach ($logs as $log) {
+            fputcsv($output, [
+                $log['id'] ?? '-',
+                $log['usuario_nome'] ?? 'Sistema',
+                $log['acao'] ?? '-',
+                $log['descricao'] ?? '-',
+                $log['ip_address'] ?? '-',
+                $log['created_at'] ?? '-'
+            ]);
+        }
+
+        fclose($output);
+
+        if (class_exists('\App\Helpers\LoggerHelper')) {
+            LoggerHelper::log('DOWNLOAD_LOGS', 'Descarregou o relatório de logs de sistema em CSV.');
+        }
+
+        exit;
+    }
 }

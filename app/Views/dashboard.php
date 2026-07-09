@@ -43,6 +43,9 @@
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
         <h2>Faturação mensal</h2>
         <div>
+            <?php if (\App\Core\Auth::isAdmin()): ?>
+                <a href="/relatorios/logs" class="btn btn-secondary" style="margin-right: 10px; font-size: 12px; background-color: #4b5563; border-color: #374151;">⬇️ Baixar Logs</a>
+            <?php endif; ?>
             <a href="/relatorios/download" class="btn btn-primary" style="margin-right: 10px; font-size: 12px;">⬇️ Baixar Relatório</a>
             <span class="badge badge-success">Últimos 6 meses</span>
         </div>
