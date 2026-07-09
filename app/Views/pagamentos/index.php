@@ -5,7 +5,9 @@
         <h1 class="h3 mb-1">Pagamentos</h1>
         <p class="text-muted mb-0">Registe, pesquise, cancele e acompanhe pagamentos.</p>
     </div>
-    <a href="/pagamentos/relatorios" class="btn btn-outline-secondary">Relatórios</a>
+    <?php if (\App\Core\Auth::isAdmin()): ?>
+        <a href="/pagamentos/relatorios" class="btn btn-outline-secondary">Relatórios</a>
+    <?php endif; ?>
 </div>
 
 <form method="get" action="/pagamentos" class="row g-2 mb-3">
@@ -17,6 +19,7 @@
     </div>
 </form>
 
+<?php if (!\App\Core\Auth::isOperador()): ?>
 <div class="card shadow-sm border-0 mb-4">
     <div class="card-body">
         <h2 class="h5 mb-3">Registrar pagamento</h2>
@@ -61,6 +64,7 @@
         </form>
     </div>
 </div>
+<?php endif; ?>
 
 <div class="card shadow-sm border-0">
     <div class="card-body">
@@ -75,7 +79,9 @@
                             <th>Valor</th>
                             <th>Método</th>
                             <th>Status</th>
-                            <th>Ações</th>
+                            <?php if (!\App\Core\Auth::isOperador()): ?>
+                                <th>Ações</th>
+                            <?php endif; ?>
                         </tr>
                     </thead>
                     <tbody>
@@ -87,13 +93,15 @@
                                     <td>AOA <?= number_format($pagamento->getValor(), 2, ',', '.') ?></td>
                                     <td><?= htmlspecialchars($pagamento->getMetodoPagamento()) ?></td>
                                     <td><?= htmlspecialchars($pagamento->getStatus()) ?></td>
-                                    <td>
-                                        <?php if ($pagamento->getStatus() !== 'Cancelado'): ?>
-                                            <form action="/pagamentos/<?= (int) $pagamento->getId() ?>/cancelar" method="post" style="display:inline;">
-                                                <button class="btn btn-sm btn-outline-danger" type="submit">Cancelar</button>
-                                            </form>
-                                        <?php endif; ?>
-                                    </td>
+                                    <?php if (!\App\Core\Auth::isOperador()): ?>
+                                        <td>
+                                            <?php if ($pagamento->getStatus() !== 'Cancelado'): ?>
+                                                <form action="/pagamentos/<?= (int) $pagamento->getId() ?>/cancelar" method="post" style="display:inline;">
+                                                    <button class="btn btn-sm btn-outline-danger" type="submit">Cancelar</button>
+                                                </form>
+                                            <?php endif; ?>
+                                        </td>
+                                    <?php endif; ?>
                                 </tr>
                         <?php endforeach; ?>
                     </tbody>

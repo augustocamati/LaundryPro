@@ -12,6 +12,11 @@ class PerfilController extends Controller {
 
     public function __construct() {
         Auth::requireAuth();
+        if (!Auth::isAdmin()) {
+            \App\Core\Session::flash('error', 'Acesso negado. Apenas administradores.');
+            header('Location: /');
+            exit;
+        }
         $this->perfilDAO = new PerfilDAO();
     }
 

@@ -15,6 +15,30 @@ class PagamentoController extends Controller {
         Auth::requireAuth();
     }
 
+    private function checkWritePermission(): void {
+        if (Auth::isOperador()) {
+            \App\Core\Session::flash('error', 'Acesso negado. Operadores não gerem pagamentos.');
+            header('Location: /pagamentos');
+            exit;
+        }
+    }
+
+    private function checkAdminPermission(): void {
+        if (!Auth::isAdmin()) {
+            \App\Core\Session::flash('error', 'Acesso negado. Apenas administradores.');
+            header('Location: /pagamentos');
+            exit;
+        }
+    }
+
+    private function checkAdminOrAtendentePermission(): void {
+        if (!Auth::isAdmin() && !Auth::isAtendente()) {
+            \App\Core\Session::flash('error', 'Acesso negado.');
+            header('Location: /pagamentos');
+            exit;
+        }
+    }
+
     public function index(): void {
         $q = trim($_GET['q'] ?? '');
         $pagamentoDAO = new PagamentoDAO();
@@ -60,6 +84,7 @@ class PagamentoController extends Controller {
     }
 
     public function registrar(): void {
+        $this->checkWritePermission();
         $pedidoId = (int) ($_POST['pedido_id'] ?? 0);
         $valor = (float) ($_POST['valor'] ?? 0);
         $metodo = trim($_POST['metodo_pagamento'] ?? 'Dinheiro');
@@ -92,6 +117,7 @@ class PagamentoController extends Controller {
     }
 
     public function cancelar(string $id): void {
+        $this->checkWritePermission();
         $pagamentoDAO = new PagamentoDAO();
         $pagamento = $pagamentoDAO->find((int) $id);
         if ($pagamento) {
@@ -102,6 +128,7 @@ class PagamentoController extends Controller {
     }
 
     public function relatorios(): void {
+        $this->checkAdminPermission();
         $pagamentoDAO = new PagamentoDAO();
         $pagamentos = $pagamentoDAO->all();
 
@@ -114,6 +141,7 @@ class PagamentoController extends Controller {
 
     public function relatoriosPdf(): void {
         Auth::requireAuth();
+        $this->checkAdminOrAtendentePermission();
 
         $pagamentoDAO = new PagamentoDAO();
         $pagamentos = $pagamentoDAO->all();

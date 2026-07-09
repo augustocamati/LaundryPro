@@ -34,15 +34,20 @@
             <div class="navbar-brand text-white mb-4 fs-4">LaundryPro <span>🇦🇴</span></div>
             <ul class="nav nav-pills flex-column gap-1">
                 <li class="nav-item"><a class="nav-link <?= ($activePage ?? '') === 'dashboard' ? 'active' : '' ?>" href="/">Painel Geral</a></li>
-                <li class="nav-item"><a class="nav-link <?= ($activePage ?? '') === 'perfis' ? 'active' : '' ?>" href="/perfis">Perfis / Cargos</a></li>
-                <li class="nav-item"><a class="nav-link <?= ($activePage ?? '') === 'usuarios' ? 'active' : '' ?>" href="/usuarios">Usuários</a></li>
-                <li class="nav-item"><a class="nav-link <?= ($activePage ?? '') === 'funcionarios' ? 'active' : '' ?>" href="/funcionarios">Funcionários</a></li>
-                <li class="nav-item"><a class="nav-link <?= ($activePage ?? '') === 'clientes' ? 'active' : '' ?>" href="/clientes">Clientes</a></li>
-                <li class="nav-item"><a class="nav-link <?= ($activePage ?? '') === 'categorias' ? 'active' : '' ?>" href="/categorias">Categorias</a></li>
-                <li class="nav-item"><a class="nav-link <?= ($activePage ?? '') === 'servicos' ? 'active' : '' ?>" href="/servicos">Serviços</a></li>
-                <!-- Pesquisas removido conforme solicitado -->
-                <li class="nav-item"><a class="nav-link <?= ($activePage ?? '') === 'pagamentos' ? 'active' : '' ?>" href="/pagamentos">Pagamentos</a></li>
+                <?php if (\App\Core\Auth::isAdmin()): ?>
+                    <li class="nav-item"><a class="nav-link <?= ($activePage ?? '') === 'perfis' ? 'active' : '' ?>" href="/perfis">Perfis / Cargos</a></li>
+                    <li class="nav-item"><a class="nav-link <?= ($activePage ?? '') === 'usuarios' ? 'active' : '' ?>" href="/usuarios">Usuários</a></li>
+                    <li class="nav-item"><a class="nav-link <?= ($activePage ?? '') === 'funcionarios' ? 'active' : '' ?>" href="/funcionarios">Funcionários</a></li>
+                    <li class="nav-item"><a class="nav-link <?= ($activePage ?? '') === 'categorias' ? 'active' : '' ?>" href="/categorias">Categorias</a></li>
+                    <li class="nav-item"><a class="nav-link <?= ($activePage ?? '') === 'servicos' ? 'active' : '' ?>" href="/servicos">Serviços</a></li>
+                <?php endif; ?>
+                <?php if (!\App\Core\Auth::isOperador()): ?>
+                    <li class="nav-item"><a class="nav-link <?= ($activePage ?? '') === 'clientes' ? 'active' : '' ?>" href="/clientes">Clientes</a></li>
+                <?php endif; ?>
                 <li class="nav-item"><a class="nav-link <?= ($activePage ?? '') === 'pedidos' ? 'active' : '' ?>" href="/pedidos">Pedidos</a></li>
+                <?php if (!\App\Core\Auth::isOperador()): ?>
+                    <li class="nav-item"><a class="nav-link <?= ($activePage ?? '') === 'pagamentos' ? 'active' : '' ?>" href="/pagamentos">Pagamentos</a></li>
+                <?php endif; ?>
             </ul>
         </aside>
         <main class="flex-grow-1">

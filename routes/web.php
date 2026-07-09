@@ -80,5 +80,6 @@ $router->get('/pagamentos/relatorios/pdf', 'PagamentoController@relatoriosPdf');
 $router->get('/pedidos', 'PedidoController@index');
 $router->get('/pedidos/novo', 'PedidoController@create');
 $router->post('/pedidos', 'PedidoController@store');
+$router->post('/pedidos/{id}/status', 'PedidoController@updateStatus');
 
 return $router;

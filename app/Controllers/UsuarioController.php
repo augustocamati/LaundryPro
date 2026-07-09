@@ -14,6 +14,11 @@ class UsuarioController extends Controller {
 
     public function __construct() {
         Auth::requireAuth();
+        if (!Auth::isAdmin()) {
+            \App\Core\Session::flash('error', 'Acesso negado. Apenas administradores.');
+            header('Location: /');
+            exit;
+        }
         $this->usuarioDAO = new UsuarioDAO();
         $this->perfilDAO = new PerfilDAO();
     }

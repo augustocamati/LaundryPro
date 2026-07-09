@@ -14,6 +14,14 @@ use App\Models\Pedido;
 use App\Models\Pagamento;
 
 class PedidoController extends Controller {
+    private function checkCreatePermission(): void {
+        if (Auth::isOperador()) {
+            \App\Core\Session::flash('error', 'Acesso negado. Apenas Gestores e Atendentes podem criar pedidos.');
+            header('Location: /pedidos');
+            exit;
+        }
+    }
+
     public function index(): void {
         Auth::requireAuth();
 
@@ -48,6 +56,7 @@ class PedidoController extends Controller {
 
     public function create(): void {
         Auth::requireAuth();
+        $this->checkCreatePermission();
 
         $clienteDAO = new ClienteDAO();
         $servicoDAO = new ServicoDAO();
@@ -64,6 +73,7 @@ class PedidoController extends Controller {
 
     public function store(): void {
         Auth::requireAuth();
+        $this->checkCreatePermission();
 
         $clienteId = (int) ($_POST['cliente_id'] ?? 0);
         $servicoId = (int) ($_POST['servico_id'] ?? 0);
@@ -142,6 +152,25 @@ class PedidoController extends Controller {
             ]);
             $pagamentoDAO = new PagamentoDAO();
             $pagamentoDAO->create($pagamento);
+        }
+
+        $this->redirect('/pedidos');
+    }
+
+    public function updateStatus(string $id): void {
+        Auth::requireAuth();
+        
+        $status = trim($_POST['status'] ?? '');
+        if (empty($status)) {
+            $this->redirect('/pedidos');
+            return;
+        }
+
+        $pedidoDAO = new PedidoDAO();
+        $pedido = $pedidoDAO->find((int) $id);
+        if ($pedido) {
+            $pedido->setStatus($status);
+            $pedidoDAO->update($pedido);
         }
 
         $this->redirect('/pedidos');

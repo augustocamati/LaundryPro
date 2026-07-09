@@ -12,7 +12,17 @@ class ClienteController extends Controller {
 
     public function __construct() {
         Auth::requireAuth();
+        if (Auth::isOperador()) {
+            \App\Core\Session::flash('error', 'Acesso negado. Operadores não gerem clientes.');
+            header('Location: /');
+            exit;
+        }
         $this->clienteDAO = new ClienteDAO();
+    }
+
+    private function checkWritePermission(): void {
+        // Only Admin and Atendente can access this controller, both can write.
+        // So no additional restrictions are needed here.
     }
 
     public function index(): void {
@@ -38,6 +48,7 @@ class ClienteController extends Controller {
     }
 
     public function create(): void {
+        $this->checkWritePermission();
         $this->render('clientes.create', [
             'title' => 'Novo Cliente - LaundryPro',
             'activePage' => 'clientes'
@@ -45,6 +56,7 @@ class ClienteController extends Controller {
     }
 
     public function store(): void {
+        $this->checkWritePermission();
         $nome = $_POST['nome'] ?? '';
         $email = $_POST['email'] ?? null;
         $telefone = $_POST['telefone'] ?? '';
@@ -95,6 +107,7 @@ class ClienteController extends Controller {
     }
 
     public function edit(string $id): void {
+        $this->checkWritePermission();
         $cliente = $this->clienteDAO->find((int)$id);
         if (!$cliente) {
             throw new \Exception("Cliente não encontrado.");
@@ -108,6 +121,7 @@ class ClienteController extends Controller {
     }
 
     public function update(string $id): void {
+        $this->checkWritePermission();
         $cliente = $this->clienteDAO->find((int)$id);
         if (!$cliente) {
             throw new \Exception("Cliente não encontrado.");
@@ -161,6 +175,7 @@ class ClienteController extends Controller {
     }
 
     public function delete(string $id): void {
+        $this->checkWritePermission();
         $this->clienteDAO->delete((int)$id);
         $this->redirect('/clientes');
     }

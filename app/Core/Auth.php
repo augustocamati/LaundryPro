@@ -95,15 +95,44 @@ class Auth {
     }
 
     /**
-     * Check if the logged-in user is an Admin.
+     * Get the logged-in user's role name.
      */
-    public static function isAdmin(): bool {
+    public static function role(): string {
+        $role = Session::get('auth_user_role');
+        if ($role) return strtolower($role);
+
         $perfilId = self::perfilId();
-        if (!$perfilId) return false;
+        if (!$perfilId) return '';
 
         $perfilDAO = new \App\DAO\PerfilDAO();
         $perfil = $perfilDAO->find($perfilId);
-        return $perfil && strtolower($perfil->getNome()) === 'admin';
+        $roleName = $perfil ? strtolower($perfil->getNome()) : '';
+        Session::set('auth_user_role', $roleName);
+        return $roleName;
+    }
+
+    /**
+     * Check if the logged-in user is an Admin (Gestor).
+     */
+    public static function isAdmin(): bool {
+        $r = self::role();
+        return in_array($r, ['admin', 'administrador', 'gestor']);
+    }
+
+    /**
+     * Check if the logged-in user is an Operador.
+     */
+    public static function isOperador(): bool {
+        $r = self::role();
+        return in_array($r, ['operador', 'funcionario']);
+    }
+
+    /**
+     * Check if the logged-in user is an Atendente (Recepcionista / Caixa).
+     */
+    public static function isAtendente(): bool {
+        $r = self::role();
+        return in_array($r, ['atendente', 'recepcionista', 'caixa']);
     }
 
     /**

@@ -5,7 +5,9 @@
         <h1 class="h3 mb-1">Pedidos</h1>
         <p class="text-muted mb-0">Fluxo principal do sistema: cliente, peças, serviço, valor, pagamento e acompanhamento.</p>
     </div>
-    <a href="/pedidos/novo" class="btn btn-primary">Novo pedido</a>
+    <?php if (!\App\Core\Auth::isOperador()): ?>
+        <a href="/pedidos/novo" class="btn btn-primary">Novo pedido</a>
+    <?php endif; ?>
 </div>
 
 <form method="get" action="/pedidos" class="row g-2 mb-3">
@@ -37,7 +39,18 @@
                             <tr>
                                 <td><?= (int) $pedido->getId() ?></td>
                                 <td><?= htmlspecialchars($clientesById[(int)$pedido->getClienteId()]->getNome() ?? $pedido->getClienteId()) ?></td>
-                                <td><span class="badge bg-info-subtle text-info-emphasis"><?= htmlspecialchars($pedido->getStatus()) ?></span></td>
+                                <td>
+                                    <form action="/pedidos/<?= $pedido->getId() ?>/status" method="POST" class="d-flex align-items-center gap-2">
+                                        <select name="status" class="form-select form-select-sm" style="width: 140px;">
+                                            <option value="Recebido" <?= $pedido->getStatus() == 'Recebido' ? 'selected' : '' ?>>Recebido</option>
+                                            <option value="Em lavagem" <?= $pedido->getStatus() == 'Em lavagem' ? 'selected' : '' ?>>Em lavagem</option>
+                                            <option value="Em secagem" <?= $pedido->getStatus() == 'Em secagem' ? 'selected' : '' ?>>Em secagem</option>
+                                            <option value="Em engomagem" <?= $pedido->getStatus() == 'Em engomagem' ? 'selected' : '' ?>>Em engomagem</option>
+                                            <option value="Finalizado" <?= $pedido->getStatus() == 'Finalizado' ? 'selected' : '' ?>>Finalizado</option>
+                                        </select>
+                                        <button type="submit" class="btn btn-sm btn-outline-primary">Atualizar</button>
+                                    </form>
+                                </td>
                                 <td>AOA <?= number_format($pedido->getValorTotal(), 2, ',', '.') ?></td>
                                 <td><?= htmlspecialchars($pedido->getDataEntregaPrevista()) ?></td>
                             </tr>

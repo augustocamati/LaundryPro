@@ -42,14 +42,14 @@
                             <td><?= htmlspecialchars($cliente->getTelefone()) ?></td>
                             <td><?= htmlspecialchars($cliente->getEmail() ?? '-') ?></td>
                             <td><?= htmlspecialchars($cliente->getEndereco() ?? '-') ?></td>
-                            <td>
-                                <div class="btn-group">
-                                    <a href="/clientes/<?= $cliente->getId() ?>/editar" class="btn btn-secondary btn-sm">Editar</a>
-                                    <form action="/clientes/<?= $cliente->getId() ?>/eliminar" method="POST" onsubmit="return confirm('Deseja realmente eliminar este cliente?');" style="display:inline;">
-                                        <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
-                                    </form>
-                                </div>
-                            </td>
+                                <td>
+                                    <div class="btn-group">
+                                        <a href="/clientes/<?= $cliente->getId() ?>/editar" class="btn btn-secondary btn-sm">Editar</a>
+                                        <form action="/clientes/<?= $cliente->getId() ?>/eliminar" method="POST" onsubmit="return confirm('Deseja realmente eliminar este cliente?');" style="display:inline;">
+                                            <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
+                                        </form>
+                                    </div>
+                                </td>
                         </tr>
                     <?php endforeach; ?>
                 <?php endif; ?>
