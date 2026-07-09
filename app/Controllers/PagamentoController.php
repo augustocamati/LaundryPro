@@ -110,7 +110,7 @@ class PagamentoController extends Controller {
         $pedido = $pedidoDAO->find($pedidoId);
         if ($pedido) {
             $pedido->setStatus($status);
-            $pedidoDAO->update($pedido);
+            // $pedidoDAO->update($pedido);
         }
 
         $this->redirect('/pagamentos');
