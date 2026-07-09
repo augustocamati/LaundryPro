@@ -42,20 +42,51 @@
 <div class="card" style="margin-bottom: 24px;">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
         <h2>Faturação mensal</h2>
-        <span class="badge badge-success">Últimos 6 meses</span>
+        <div>
+            <a href="/relatorios/download" class="btn btn-primary" style="margin-right: 10px; font-size: 12px;">⬇️ Baixar Relatório</a>
+            <span class="badge badge-success">Últimos 6 meses</span>
+        </div>
     </div>
     <?php if (!empty($graficoLabels)): ?>
-        <div style="display:flex; align-items:flex-end; gap: 12px; min-height: 220px;">
-            <?php for ($i = 0; $i < count($graficoLabels); $i++): ?>
-                <?php $value = (float) ($graficoData[$i] ?? 0); $height = $value > 0 ? min(100, 18 + ($value / max(1, max($graficoData))) * 70) : 12; ?>
-                <div style="flex: 1; display:flex; flex-direction:column; align-items:center; gap: 8px;">
-                    <div style="width: 100%; min-height: 150px; display:flex; align-items:flex-end; justify-content:center;">
-                        <div style="width: 100%; max-width: 44px; height: <?= $height ?>%; background: linear-gradient(180deg, #60a5fa 0%, #2563eb 100%); border-radius: 8px 8px 0 0;"></div>
-                    </div>
-                    <div style="font-size: 12px; color: var(--text-muted); text-align:center;"><?= htmlspecialchars($graficoLabels[$i]) ?><br><strong><?= number_format($value, 2, ',', '.') ?></strong></div>
-                </div>
-            <?php endfor; ?>
-        </div>
+        <canvas id="faturacaoChart" style="width: 100%; max-height: 300px;"></canvas>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script>
+            document.addEventListener("DOMContentLoaded", function() {
+                const ctx = document.getElementById('faturacaoChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: <?= json_encode($graficoLabels) ?>,
+                        datasets: [{
+                            label: 'Faturação (AOA)',
+                            data: <?= json_encode($graficoData) ?>,
+                            backgroundColor: 'rgba(59, 130, 246, 0.8)',
+                            borderColor: 'rgba(37, 99, 235, 1)',
+                            borderWidth: 1,
+                            borderRadius: 4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                                ticks: { color: '#9ca3af' }
+                            },
+                            x: {
+                                grid: { display: false },
+                                ticks: { color: '#9ca3af' }
+                            }
+                        }
+                    }
+                });
+            });
+        </script>
     <?php else: ?>
         <p style="color: var(--text-muted);">Ainda não existem dados de faturação para exibir.</p>
     <?php endif; ?>

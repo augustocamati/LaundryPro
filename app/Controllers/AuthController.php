@@ -61,6 +61,10 @@ class AuthController extends Controller {
             setcookie('lp_remember', '', time() - 3600, '/');
         }
 
+        if (class_exists('\App\Helpers\LoggerHelper')) {
+            \App\Helpers\LoggerHelper::log('LOGIN', "Usuário '{$usuario->getNome()}' iniciou sessão.");
+        }
+
         $this->redirect('/');
     }
 
@@ -69,6 +73,9 @@ class AuthController extends Controller {
     // ─────────────────────────────────────────────
 
     public function logout(): void {
+        if (class_exists('\App\Helpers\LoggerHelper') && \App\Core\Auth::check()) {
+            \App\Helpers\LoggerHelper::log('LOGOUT', "Usuário '" . \App\Core\Auth::nome() . "' encerrou sessão.");
+        }
         Auth::logout();
         Session::flash('success', 'Sessão terminada com sucesso.');
         $this->redirect('/login');

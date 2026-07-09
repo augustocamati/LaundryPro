@@ -77,6 +77,9 @@ abstract class BaseDAO {
             if (method_exists($model, 'setId')) {
                 $model->setId($id);
             }
+            if ($this->table !== 'logs' && class_exists('\App\Helpers\LoggerHelper')) {
+                \App\Helpers\LoggerHelper::log('CREATE', "Criado registro na tabela {$this->table} com ID {$id}");
+            }
             return $id;
         }
         return false;
@@ -105,7 +108,13 @@ abstract class BaseDAO {
         
         $params = array_merge($data, ['primary_id' => $id]);
         $stmt = $this->db->prepare($sql);
-        return $stmt->execute($params);
+        $result = $stmt->execute($params);
+        
+        if ($result && $this->table !== 'logs' && class_exists('\App\Helpers\LoggerHelper')) {
+            \App\Helpers\LoggerHelper::log('UPDATE', "Atualizado registro na tabela {$this->table} com ID {$id}");
+        }
+        
+        return $result;
     }
 
     /**
@@ -116,6 +125,12 @@ abstract class BaseDAO {
      */
     public function delete(int $id): bool {
         $stmt = $this->db->prepare("DELETE FROM {$this->table} WHERE id = :id");
-        return $stmt->execute(['id' => $id]);
+        $result = $stmt->execute(['id' => $id]);
+        
+        if ($result && $this->table !== 'logs' && class_exists('\App\Helpers\LoggerHelper')) {
+            \App\Helpers\LoggerHelper::log('DELETE', "Removido registro na tabela {$this->table} com ID {$id}");
+        }
+        
+        return $result;
     }
 }

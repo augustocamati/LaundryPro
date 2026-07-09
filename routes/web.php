@@ -6,6 +6,7 @@ $router = new Router();
 
 // Dashboard / Home
 $router->get('/', 'DashboardController@index');
+$router->get('/relatorios/download', 'RelatorioController@download');
 
 // Auth & Account
 $router->get('/login', 'AuthController@loginForm');
